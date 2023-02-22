@@ -35,6 +35,7 @@ describe("Testing User Route API", () => {
         lastname: "Pham",
         email: "ginta2888@gmail.com",
         mobile: "0918377256",
+        role: "user"
       })
     );
   });
