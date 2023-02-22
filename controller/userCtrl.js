@@ -16,22 +16,84 @@ const createUser = asyncHandler(async (req, res) => {
 });
 
 const loginUserCtrl = asyncHandler(async (req, res) => {
-    const {email, password} = req.body;
-    // check if user exists or not 
-    const findUser = await User.findOne({email});
-    if (findUser && await findUser.isPasswordMatched(password)){
-        res.json({
-            _id : findUser?._id,
-            firstname: findUser?.firstname,
-            lastname: findUser?.lastname,
-            email: findUser?.email,
-            mobile: findUser?.mobile,
-            token: generateToken(findUser?.id),
-        });
-    }
-    else {
-        throw new Error("Invalid Credentials");
-    }
+  const { email, password } = req.body;
+  // check if user exists or not
+  const findUser = await User.findOne({ email });
+  if (findUser && (await findUser.isPasswordMatched(password))) {
+    res.json({
+      _id: findUser?._id,
+      firstname: findUser?.firstname,
+      lastname: findUser?.lastname,
+      email: findUser?.email,
+      mobile: findUser?.mobile,
+      token: generateToken(findUser?.id),
+    });
+  } else {
+    throw new Error("Invalid Credentials");
+  }
 });
 
-module.exports = { createUser, loginUserCtrl };
+// Get all users
+
+const getAllUser = asyncHandler(async (req, res) => {
+  try {
+    const getUsers = await User.find();
+    res.json(getUsers);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+// Get a single user
+
+const getaUser = asyncHandler(async (req, res) => {
+  try {
+    const { id } = req.params;
+    const getUser = await User.findById(id);
+    res.json(getUser);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+// Delete a single user
+
+const deleteaUser = asyncHandler(async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleteUser = await User.findByIdAndDelete(id);
+    res.json(deleteUser);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+// Update a user
+
+const updateaUser = asyncHandler(async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      {
+        firstname: req?.body?.firstname,
+        lastname: req?.body?.lastname,
+        email: req?.body?.email,
+        mobile: req?.body?.mobile,
+      },
+      { new: true, }
+    );
+    res.json(updatedUser);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+module.exports = {
+  createUser,
+  loginUserCtrl,
+  getAllUser,
+  getaUser,
+  deleteaUser,
+  updateaUser,
+};

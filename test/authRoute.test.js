@@ -35,7 +35,32 @@ describe("Testing User Route API", () => {
         lastname: "Pham",
         email: "ginta2888@gmail.com",
         mobile: "0918377256",
-        role: "user"
+        role: "user",
+      })
+    );
+  });
+
+  it("POST /api/user/register Create another user in database", async () => {
+    const mockUser = {
+      firstname: "Toane",
+      lastname: "Phame",
+      email: "ginta2777@gmail.com",
+      mobile: "0918377259",
+      password: "$ecret123",
+    };
+
+    const res = await request(app)
+      .post("/api/user/register")
+      .set("Content-type", "application/json")
+      .send(mockUser)
+      .expect(200);
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        firstname: "Toane",
+        lastname: "Phame",
+        email: "ginta2777@gmail.com",
+        mobile: "0918377259",
+        role: "user",
       })
     );
   });
@@ -90,5 +115,28 @@ describe("Testing User Route API", () => {
         message: "Invalid Credentials",
       })
     );
+  });
+
+  it("GET /api/user/all-users Get all user from db", async () => {
+    const res = await request(app)
+      .get("/api/user/all-users")
+      .set("Content-type", "application/json")
+      .expect(200);
+    expect(res.body).toEqual([
+      expect.objectContaining({
+        firstname: "Toan",
+        lastname: "Pham",
+        email: "ginta2888@gmail.com",
+        mobile: "0918377256",
+        role: "user",
+      }),
+      expect.objectContaining({
+        firstname: "Toane",
+        lastname: "Phame",
+        email: "ginta2777@gmail.com",
+        mobile: "0918377259",
+        role: "user",
+      }),
+    ]);
   });
 });
