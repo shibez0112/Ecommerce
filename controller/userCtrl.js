@@ -81,9 +81,45 @@ const updateaUser = asyncHandler(async (req, res) => {
         email: req?.body?.email,
         mobile: req?.body?.mobile,
       },
-      { new: true, }
+      { new: true }
     );
     res.json(updatedUser);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const blockUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  console.log(id);
+  try {
+    const block = await User.findByIdAndUpdate(
+      id,
+      {
+        isBlocked: true,
+      },
+      {
+        new: true,
+      }
+    );
+    res.json(block);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+const unblockUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  try {
+    const block = await User.findByIdAndUpdate(
+      id,
+      {
+        isBlocked: false,
+      },
+      {
+        new: true,
+      }
+    );
+    res.json(block);
   } catch (error) {
     throw new Error(error);
   }
@@ -96,4 +132,6 @@ module.exports = {
   getaUser,
   deleteaUser,
   updateaUser,
+  blockUser,
+  unblockUser,
 };
