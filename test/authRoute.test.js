@@ -2,8 +2,12 @@ const mongoose = require("mongoose");
 const request = require("supertest");
 const app = require("../index");
 const { MongoMemoryServer } = require("mongodb-memory-server");
+const { json } = require("body-parser");
 
 describe("Testing User Route API", () => {
+  let authToken;
+  let userId;
+
   beforeAll(async () => {
     const mongoServer = await MongoMemoryServer.create();
 
@@ -20,8 +24,9 @@ describe("Testing User Route API", () => {
       firstname: "Toan",
       lastname: "Pham",
       email: "ginta2888@gmail.com",
-      mobile: "0918377256",
+      mobile: "0918322179",
       password: "$ecret123",
+      role: "admin",
     };
 
     const res = await request(app)
@@ -34,13 +39,13 @@ describe("Testing User Route API", () => {
         firstname: "Toan",
         lastname: "Pham",
         email: "ginta2888@gmail.com",
-        mobile: "0918377256",
-        role: "user",
+        mobile: "0918322179",
+        role: "admin",
       })
     );
   });
 
-  it("POST /api/user/register Create another user in database", async () => {
+  it("POST /api/user/register Create another new user in database", async () => {
     const mockUser = {
       firstname: "Toane",
       lastname: "Phame",
@@ -63,6 +68,9 @@ describe("Testing User Route API", () => {
         role: "user",
       })
     );
+
+    // Get user Id for further testing
+    userId = res.body._id;
   });
 
   it("POST /api/user/register Create duplicate user with same email in database", async () => {
@@ -97,6 +105,9 @@ describe("Testing User Route API", () => {
       .set("Content-type", "application/json")
       .send(mockUser)
       .expect(200);
+
+    // get token for bearer authentication
+    authToken = res.body.token;
   });
 
   it("POST /api/user/login Login with incorrect password", async () => {
@@ -127,8 +138,8 @@ describe("Testing User Route API", () => {
         firstname: "Toan",
         lastname: "Pham",
         email: "ginta2888@gmail.com",
-        mobile: "0918377256",
-        role: "user",
+        mobile: "0918322179",
+        role: "admin",
       }),
       expect.objectContaining({
         firstname: "Toane",
@@ -138,5 +149,41 @@ describe("Testing User Route API", () => {
         role: "user",
       }),
     ]);
+  });
+
+  it("PUT /api/user/block-user/:id Block user ginta2777@gmail.com ", async () => {
+    console.log(`/api/user/block-user/${userId}`);
+    const res = await request(app)
+      .put(`/api/user/block-user/${userId}`)
+      .auth(authToken, { type: "bearer" })
+      .expect(200);
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        firstname: "Toane",
+        lastname: "Phame",
+        email: "ginta2777@gmail.com",
+        mobile: "0918377259",
+        role: "user",
+        isBlocked: true,
+      })
+    );
+  });
+
+  it("PUT /api/user/block-user/:id Block user ginta2777@gmail.com ", async () => {
+    console.log(`/api/user/block-user/${userId}`);
+    const res = await request(app)
+      .put(`/api/user/unblock-user/${userId}`)
+      .auth(authToken, { type: "bearer" })
+      .expect(200);
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        firstname: "Toane",
+        lastname: "Phame",
+        email: "ginta2777@gmail.com",
+        mobile: "0918377259",
+        role: "user",
+        isBlocked: false,
+      })
+    );
   });
 });
