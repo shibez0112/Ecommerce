@@ -1,7 +1,8 @@
 const User = require("../models/userModel");
 const asyncHandler = require("express-async-handler");
 const { generateToken } = require("../config/jwtToken");
-const { find } = require("../models/userModel");
+const { find, validate } = require("../models/userModel");
+const validateMongoDbId = require("../utils/validateMongodbId");
 const createUser = asyncHandler(async (req, res) => {
   const email = req.body.email;
   const findUser = await User.findOne({ email: email });
@@ -47,8 +48,9 @@ const getAllUser = asyncHandler(async (req, res) => {
 // Get a single user
 
 const getaUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  validateMongoDbId(id);
   try {
-    const { id } = req.params;
     const getUser = await User.findById(id);
     res.json(getUser);
   } catch (error) {
@@ -56,11 +58,13 @@ const getaUser = asyncHandler(async (req, res) => {
   }
 });
 
+
 // Delete a single user
 
 const deleteaUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  validateMongoDbId(id);
   try {
-    const { id } = req.params;
     const deleteUser = await User.findByIdAndDelete(id);
     res.json(deleteUser);
   } catch (error) {
@@ -68,11 +72,14 @@ const deleteaUser = asyncHandler(async (req, res) => {
   }
 });
 
+
+
 // Update a user
 
 const updateaUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  validateMongoDbId(id);
   try {
-    const { id } = req.params;
     const updatedUser = await User.findByIdAndUpdate(
       id,
       {
@@ -89,9 +96,13 @@ const updateaUser = asyncHandler(async (req, res) => {
   }
 });
 
+
+// Block a user
+
 const blockUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  console.log(id);
+  validateMongoDbId(id);
+
   try {
     const block = await User.findByIdAndUpdate(
       id,
@@ -107,8 +118,14 @@ const blockUser = asyncHandler(async (req, res) => {
     throw new Error(error);
   }
 });
+
+
+// Ublock a user
+
 const unblockUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
+  validateMongoDbId(id);
+  console.log("Pass validate in unblock");
   try {
     const block = await User.findByIdAndUpdate(
       id,

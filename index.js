@@ -6,7 +6,7 @@ const app = express();
 const dotenv = require("dotenv").config();
 const PORT = process.env.PORT || 3000;
 const authRouter = require("./routes/authRoute");
-// dbConnect();
+//dbConnect();
 
 // Middleware
 app.use(bodyParser.json());

@@ -152,7 +152,6 @@ describe("Testing User Route API", () => {
   });
 
   it("PUT /api/user/block-user/:id Block user ginta2777@gmail.com ", async () => {
-    console.log(`/api/user/block-user/${userId}`);
     const res = await request(app)
       .put(`/api/user/block-user/${userId}`)
       .auth(authToken, { type: "bearer" })
@@ -169,8 +168,7 @@ describe("Testing User Route API", () => {
     );
   });
 
-  it("PUT /api/user/block-user/:id Block user ginta2777@gmail.com ", async () => {
-    console.log(`/api/user/block-user/${userId}`);
+  it("PUT /api/user/block-user/:id Unblock user ginta2777@gmail.com ", async () => {
     const res = await request(app)
       .put(`/api/user/unblock-user/${userId}`)
       .auth(authToken, { type: "bearer" })
