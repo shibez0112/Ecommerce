@@ -7,7 +7,7 @@ const dotenv = require("dotenv").config();
 const authRouter = require("./routes/authRoute");
 const cookieParser = require("cookie-parser");
 const PORT = process.env.PORT || 3000;
-dbConnect();
+//dbConnect();
 
 // Middleware
 app.use(bodyParser.json());

@@ -3,16 +3,20 @@ const jwt = require("jsonwebtoken");
 const asyncHandler = require("express-async-handler");
 
 const authMiddleware = asyncHandler(async (req, res, next) => {
-  let token;
-  if (req?.headers?.authorization.startsWith("Bearer")) {
-    token = req.headers.authorization.split(" ")[1];
+  const refreshToken = req.cookies.refreshToken;
+  if (refreshToken) {
     try {
-      if (token) {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const findUser = await User.findOne({ refreshToken });
+      if (!findUser)
+        throw new Error("No Refresh token present in db or not matched");
+      jwt.verify(refreshToken, process.env.JWT_SECRET, async (err, decoded) => {
+        if (err || findUser.id !== decoded.id) {
+          throw new Error("There is something wrong with refresh token");
+        }
         const user = await User.findById(decoded?.id);
         req.user = user;
         next();
-      }
+      });
     } catch (error) {
       throw new Error("Not Authorized token expired");
     }
