@@ -3,9 +3,8 @@ const request = require("supertest");
 const app = require("../index");
 const { MongoMemoryServer } = require("mongodb-memory-server");
 
-
 describe("Testing User Route API", () => {
-  let authToken;
+  let cookies;
   let userId;
 
   beforeAll(async () => {
@@ -106,8 +105,8 @@ describe("Testing User Route API", () => {
       .send(mockUser)
       .expect(200);
 
-    // get token for bearer authentication
-    authToken = res.body.token;
+    // get cookies for authentication
+    cookies = res.headers['set-cookie']
   });
 
   it("POST /api/user/login Login with incorrect password", async () => {
@@ -132,6 +131,7 @@ describe("Testing User Route API", () => {
     const res = await request(app)
       .get("/api/user/all-users")
       .set("Content-type", "application/json")
+      .set("Cookie", cookies)
       .expect(200);
     expect(res.body).toEqual([
       expect.objectContaining({
@@ -154,7 +154,7 @@ describe("Testing User Route API", () => {
   it("PUT /api/user/block-user/:id Block user ginta2777@gmail.com ", async () => {
     const res = await request(app)
       .put(`/api/user/block-user/${userId}`)
-      .auth(authToken, { type: "bearer" })
+      .set("Cookie", cookies)
       .expect(200);
     expect(res.body).toEqual(
       expect.objectContaining({
@@ -171,7 +171,7 @@ describe("Testing User Route API", () => {
   it("PUT /api/user/block-user/:id Unblock user ginta2777@gmail.com ", async () => {
     const res = await request(app)
       .put(`/api/user/unblock-user/${userId}`)
-      .auth(authToken, { type: "bearer" })
+      .set("Cookie", cookies)
       .expect(200);
     expect(res.body).toEqual(
       expect.objectContaining({
@@ -198,13 +198,12 @@ describe("Testing User Route API", () => {
       .send(mockUser)
       .expect(200);
 
-    // get token for bearer authentication
-    authToken = resLogin.body.token;
-
+    // get cookies for authentication
+    cookies = resLogin.headers['set-cookie']
 
     const res = await request(app)
       .put(`/api/user/block-user/${userId}`)
-      .auth(authToken, { type: "bearer" })
+      .set("Cookie", cookies)
       .expect(500);
     expect(res.body).toEqual(
       expect.objectContaining({
