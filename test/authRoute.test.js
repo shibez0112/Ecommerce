@@ -184,4 +184,32 @@ describe("Testing User Route API", () => {
       })
     );
   });
+
+  it("PUT /api/user/block-user/:id Block user ginta2777@gmail.com but unauthorized", async () => {
+
+    const mockUser = {
+      email: "ginta2777@gmail.com",
+      password: "$ecret123",
+    };
+
+    const resLogin = await request(app)
+      .post("/api/user/login")
+      .set("Content-type", "application/json")
+      .send(mockUser)
+      .expect(200);
+
+    // get token for bearer authentication
+    authToken = resLogin.body.token;
+
+
+    const res = await request(app)
+      .put(`/api/user/block-user/${userId}`)
+      .auth(authToken, { type: "bearer" })
+      .expect(500);
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        message: "You re not an admin",
+      })
+    );
+  });
 });
