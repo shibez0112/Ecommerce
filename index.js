@@ -5,6 +5,7 @@ const { notFound, errorHandler } = require("./middlewares/errorHandler");
 const app = express();
 const dotenv = require("dotenv").config();
 const authRouter = require("./routes/authRoute");
+const productRouter = require("./routes/productRoute");
 const cookieParser = require("cookie-parser");
 const PORT = process.env.PORT || 3000;
 //dbConnect();
@@ -16,6 +17,7 @@ app.use(cookieParser());
 
 // Routing
 app.use("/api/user", authRouter);
+app.use("/api/product", productRouter);
 
 
 app.use(notFound);
