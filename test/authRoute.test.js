@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const request = require("supertest");
 const app = require("../index");
 const { MongoMemoryServer } = require("mongodb-memory-server");
-const { json } = require("body-parser");
+
 
 describe("Testing User Route API", () => {
   let authToken;
