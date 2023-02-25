@@ -101,6 +101,51 @@ describe("Testing Product Route API", () => {
       .set("Content-type", "application/json")
       .expect(200);
     expect(res.body.length).toBeGreaterThan(0);
+    //console.log(res.body);
+  });
+
+  it ("PUT /api/product/:id Update a product", async() =>{
+    const updateData = {
+      title: "Apple Watch 3",
+      description: "This is a newer apple product",
+      price: 2500,
+      quantity: 2100,
+      category: "Phone",
+      brand: "Apple",
+      color: "Red",
+    };
+
+    const res = await request(app)
+    .put(`/api/product/${productId}`)
+    .send(updateData)
+    .expect(200);
+    expect(res.body).toEqual(expect.objectContaining({
+      title: "Apple Watch 3",
+      description: "This is a newer apple product",
+      price: 2500,
+      quantity: 2100,
+      category: "Phone",
+      brand: "Apple",
+      color: "Red",
+    }));
     console.log(res.body);
   });
+
+  it("DELETE /api/product/:id Delete a product", async() =>{
+    const res = await request(app)
+    .delete(`/api/product/${productId}`)
+    .expect(200);
+    expect(res.body).toEqual(expect.objectContaining({
+      title: "Apple Watch 3",
+      description: "This is a newer apple product",
+      price: 2500,
+      quantity: 2100,
+      category: "Phone",
+      brand: "Apple",
+      color: "Red",
+    }));
+  });
+
+
+
 });
