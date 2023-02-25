@@ -18,6 +18,48 @@ describe("Testing Product Route API", () => {
     await mongoose.connection.close();
   });
 
+  it("POST /api/user/register Create new user in database", async () => {
+    const mockUser = {
+      firstname: "Toan",
+      lastname: "Pham",
+      email: "ginta2888@gmail.com",
+      mobile: "0918322179",
+      password: "$ecret123",
+      role: "admin",
+    };
+
+    const res = await request(app)
+      .post("/api/user/register")
+      .set("Content-type", "application/json")
+      .send(mockUser)
+      .expect(200);
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        firstname: "Toan",
+        lastname: "Pham",
+        email: "ginta2888@gmail.com",
+        mobile: "0918322179",
+        role: "admin",
+      })
+    );
+  });
+
+  it("POST /api/user/login Login with correct password", async () => {
+    const mockUser = {
+      email: "ginta2888@gmail.com",
+      password: "$ecret123",
+    };
+
+    const res = await request(app)
+      .post("/api/user/login")
+      .set("Content-type", "application/json")
+      .send(mockUser)
+      .expect(200);
+
+    // get cookies for authentication
+    cookies = res.headers['set-cookie']
+  });
+
   it("POST /api/product/ Create a new product", async () => {
     const mockProduct = {
       title: "Apple Watch",
@@ -32,6 +74,7 @@ describe("Testing Product Route API", () => {
     const res = await request(app)
       .post("/api/product/")
       .set("Content-type", "application/json")
+      .set("Cookie", cookies)
       .send(mockProduct)
       .expect(200);
     expect(res.body).toEqual(
@@ -60,6 +103,7 @@ describe("Testing Product Route API", () => {
     const res = await request(app)
       .post("/api/product/")
       .set("Content-type", "application/json")
+      .set("Cookie", cookies)
       .send(mockProduct)
       .expect(200);
     expect(res.body).toEqual(
@@ -117,6 +161,7 @@ describe("Testing Product Route API", () => {
 
     const res = await request(app)
     .put(`/api/product/${productId}`)
+    .set("Cookie", cookies)
     .send(updateData)
     .expect(200);
     expect(res.body).toEqual(expect.objectContaining({
@@ -134,6 +179,7 @@ describe("Testing Product Route API", () => {
   it("DELETE /api/product/:id Delete a product", async() =>{
     const res = await request(app)
     .delete(`/api/product/${productId}`)
+    .set("Cookie", cookies)
     .expect(200);
     expect(res.body).toEqual(expect.objectContaining({
       title: "Apple Watch 3",
