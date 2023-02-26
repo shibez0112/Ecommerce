@@ -106,7 +106,7 @@ describe("Testing User Route API", () => {
       .expect(200);
 
     // get cookies for authentication
-    cookies = res.headers['set-cookie']
+    cookies = res.headers["set-cookie"];
   });
 
   it("POST /api/user/login Login with incorrect password", async () => {
@@ -186,7 +186,6 @@ describe("Testing User Route API", () => {
   });
 
   it("PUT /api/user/block-user/:id Block user ginta2777@gmail.com but unauthorized", async () => {
-
     const mockUser = {
       email: "ginta2777@gmail.com",
       password: "$ecret123",
@@ -199,7 +198,7 @@ describe("Testing User Route API", () => {
       .expect(200);
 
     // get cookies for authentication
-    cookies = resLogin.headers['set-cookie']
+    cookies = resLogin.headers["set-cookie"];
 
     const res = await request(app)
       .put(`/api/user/block-user/${userId}`)
@@ -208,6 +207,52 @@ describe("Testing User Route API", () => {
     expect(res.body).toEqual(
       expect.objectContaining({
         message: "You re not an admin",
+      })
+    );
+  });
+
+  it("PUT /api/user/password Reset user password", async () => {
+    let mockUser = {
+      email: "ginta2888@gmail.com",
+      password: "$ecret123",
+    };
+
+    // Login
+    const resLogin = await request(app)
+      .post("/api/user/login")
+      .set("Content-type", "application/json")
+      .send(mockUser)
+      .expect(200);
+
+    cookies = resLogin.headers["set-cookie"];
+
+    const mockPassword = {
+      email: "ginta2888@gmail.com",
+      password: "Secret123",
+    };
+
+    // Change password
+    const resPassword = await request(app)
+      .put("/api/user/password")
+      .set("Content-type", "application/json")
+      .set("Cookie", cookies)
+      .send(mockPassword)
+      .expect(200);
+      console.log("Change password success");
+
+    // Login
+    const loginAgain = await request(app)
+      .post("/api/user/login")
+      .set("Content-type", "application/json")
+      .send(mockPassword)
+      .expect(200);
+
+    expect(loginAgain.body).toEqual(
+      expect.objectContaining({
+        firstname: "Toan",
+        lastname: "Pham",
+        email: "ginta2888@gmail.com",
+        mobile: "0918322179",
       })
     );
   });
