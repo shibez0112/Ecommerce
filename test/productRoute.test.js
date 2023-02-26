@@ -121,6 +121,36 @@ describe("Testing Product Route API", () => {
     productId = res.body._id;
   });
 
+  it("POST /api/product/ Create a third product", async () => {
+    const mockProduct = {
+      title: "HP Laptop",
+      description: "This is a HP laptop",
+      price: 2000,
+      quantity: 1100,
+      category: "Computer",
+      brand: "HP",
+      color: "Black",
+    };
+
+    const res = await request(app)
+      .post("/api/product/")
+      .set("Content-type", "application/json")
+      .set("Cookie", cookies)
+      .send(mockProduct)
+      .expect(200);
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        title: "HP Laptop",
+        description: "This is a HP laptop",
+        price: 2000,
+        quantity: 1100,
+        category: "Computer",
+        brand: "HP",
+        color: "Black",
+      })
+    );
+  });
+
   it("GET /api/product/:id Get a product", async () => {
     const res = await request(app)
       .get(`/api/product/${productId}`)
@@ -173,7 +203,7 @@ describe("Testing Product Route API", () => {
       brand: "Apple",
       color: "Red",
     }));
-    console.log(res.body);
+    //console.log(res.body);
   });
 
   it("DELETE /api/product/:id Delete a product", async() =>{
@@ -192,6 +222,23 @@ describe("Testing Product Route API", () => {
     }));
   });
 
+  it("GET /api/product/all-product Get all HP product", async () => {
+    const res = await request(app)
+      .get("/api/product/all-product?sort=category.brand")
+      .set("Content-type", "application/json")
+      .expect(200);
+    expect(res.body.length).toBeGreaterThan(0);
+    //console.log(res.body);
+  });
+
+  it("GET /api/product/all-product Get all HP product", async () => {
+    const res = await request(app)
+      .get("/api/product/all-product?fields=title,price,category")
+      .set("Content-type", "application/json")
+      .expect(200);
+    expect(res.body.length).toBeGreaterThan(0);
+    console.log(res.body);
+  });
 
 
 });
