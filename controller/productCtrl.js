@@ -58,11 +58,12 @@ const getAllProduct = asyncHandler(async (req, res) => {
     let query = Product.find(JSON.parse(queryStr));
 
     // Sorting
+    
     if (req.query.sort) {
       const sortBy = req.query.sort.split(",").join(" ");
-      query = query.sort(sortBy)
+      query = query.sort(sortBy);
     } else {
-      query = query.sort("-createdAt")
+      query = query.sort("-createdAt");
     }
 
     // Limiting the fields
@@ -103,7 +104,6 @@ const deleteProduct = asyncHandler(async (req, res) => {
   }
 });
 
-// 2:43:17
 
 module.exports = {
   createProduct,
