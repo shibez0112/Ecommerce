@@ -6,10 +6,11 @@ const app = express();
 const dotenv = require("dotenv").config();
 const authRouter = require("./routes/authRoute");
 const productRouter = require("./routes/productRoute");
+const blogRouter = require("./routes/blogRoute");
 const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 const PORT = process.env.PORT || 3000;
-//dbConnect();
+// dbConnect();
 
 // Middleware
 app.use(morgan("dev"));
@@ -20,6 +21,7 @@ app.use(cookieParser());
 // Routing
 app.use("/api/user", authRouter);
 app.use("/api/product", productRouter);
+app.use("/api/blog", blogRouter);
 
 
 app.use(notFound);
