@@ -16,4 +16,4 @@ var categorySchema = new mongoose.Schema(
 );
 
 //Export the model
-module.exports = mongoose.model("PCategory", categorySchema);
+module.exports = mongoose.model("BCategory", categorySchema);
