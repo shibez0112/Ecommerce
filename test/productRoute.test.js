@@ -6,6 +6,7 @@ const { MongoMemoryServer } = require("mongodb-memory-server");
 describe("Testing Product Route API", () => {
   let cookies;
   let productId;
+  let userId;
 
   beforeAll(async () => {
     const mongoServer = await MongoMemoryServer.create();
@@ -57,7 +58,8 @@ describe("Testing Product Route API", () => {
       .expect(200);
 
     // get cookies for authentication
-    cookies = res.headers['set-cookie']
+    cookies = res.headers["set-cookie"];
+    userId = res.body._id;
   });
 
   it("POST /api/product/ Create a new product", async () => {
@@ -169,16 +171,7 @@ describe("Testing Product Route API", () => {
     );
   });
 
-  it("GET /api/product/all-product Get all product", async () => {
-    const res = await request(app)
-      .get("/api/product/all-product")
-      .set("Content-type", "application/json")
-      .expect(200);
-    expect(res.body.length).toBeGreaterThan(0);
-    //console.log(res.body);
-  });
-
-  it ("PUT /api/product/:id Update a product", async() =>{
+  it("PUT /api/product/:id Update a product", async () => {
     const updateData = {
       title: "Apple Watch 3",
       description: "This is a newer apple product",
@@ -190,36 +183,91 @@ describe("Testing Product Route API", () => {
     };
 
     const res = await request(app)
-    .put(`/api/product/${productId}`)
-    .set("Cookie", cookies)
-    .send(updateData)
-    .expect(200);
-    expect(res.body).toEqual(expect.objectContaining({
-      title: "Apple Watch 3",
-      description: "This is a newer apple product",
-      price: 2500,
-      quantity: 2100,
-      category: "Phone",
-      brand: "Apple",
-      color: "Red",
-    }));
-    //console.log(res.body);
+      .put(`/api/product/${productId}`)
+      .set("Cookie", cookies)
+      .send(updateData)
+      .expect(200);
+
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        title: "Apple Watch 3",
+        description: "This is a newer apple product",
+        price: 2500,
+        quantity: 2100,
+        category: "Phone",
+        brand: "Apple",
+        color: "Red",
+      })
+    );
   });
 
-  it("DELETE /api/product/:id Delete a product", async() =>{
+  it("GET /api/product/all-product Get all product", async () => {
     const res = await request(app)
-    .delete(`/api/product/${productId}`)
-    .set("Cookie", cookies)
-    .expect(200);
-    expect(res.body).toEqual(expect.objectContaining({
-      title: "Apple Watch 3",
-      description: "This is a newer apple product",
-      price: 2500,
-      quantity: 2100,
-      category: "Phone",
-      brand: "Apple",
-      color: "Red",
-    }));
+      .get("/api/product/all-product")
+      .set("Content-type", "application/json")
+      .expect(200);
+    expect(res.body.length).toBeGreaterThan(0);
+  });
+
+  it("PUT /api/product/wishlist Wishlist a product", async () => {
+    const res = await request(app)
+      .put("/api/product/wishlist")
+      .set("Cookie", cookies)
+      .send({ productId: productId })
+      .expect(200);
+
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        firstname: "Toan",
+        lastname: "Pham",
+        email: "ginta2888@gmail.com",
+        mobile: "0918322179",
+        role: "admin",
+        wishlist: [productId],
+      })
+    );
+  });
+
+  it("PUT /api/product/rating Rate a product", async () => {
+    const res = await request(app)
+      .put("/api/product/rating")
+      .set("Cookie", cookies)
+      .send({ productId: productId, star: 4 })
+      .expect(200);
+
+    expect(res.body).toEqual(
+      expect.objectContaining(
+        {
+          title: "Apple Watch 3",
+          description: "This is a newer apple product",
+          price: 2500,
+          quantity: 2100,
+          category: "Phone",
+          brand: "Apple",
+          color: "Red",
+          totalrating: "4",
+        },
+        expect.objectContaining({ ratings: [{ star: 4, postedby: userId }] })
+      )
+    );
+  });
+
+  it("DELETE /api/product/:id Delete a product", async () => {
+    const res = await request(app)
+      .delete(`/api/product/${productId}`)
+      .set("Cookie", cookies)
+      .expect(200);
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        title: "Apple Watch 3",
+        description: "This is a newer apple product",
+        price: 2500,
+        quantity: 2100,
+        category: "Phone",
+        brand: "Apple",
+        color: "Red",
+      })
+    );
   });
 
   it("GET /api/product/all-product Get all HP product", async () => {
@@ -228,7 +276,6 @@ describe("Testing Product Route API", () => {
       .set("Content-type", "application/json")
       .expect(200);
     expect(res.body.length).toBeGreaterThan(0);
-    //console.log(res.body);
   });
 
   it("GET /api/product/all-product Get all HP product", async () => {
@@ -237,8 +284,5 @@ describe("Testing Product Route API", () => {
       .set("Content-type", "application/json")
       .expect(200);
     expect(res.body.length).toBeGreaterThan(0);
-    console.log(res.body);
   });
-
-
 });
