@@ -10,7 +10,7 @@ const blogRouter = require("./routes/blogRoute");
 const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 const PORT = process.env.PORT || 3000;
-// dbConnect();
+//dbConnect();
 
 // Middleware
 app.use(morgan("dev"));
