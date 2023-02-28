@@ -204,11 +204,10 @@ describe("Testing Blog Route API", () => {
         numViews: 1,
       })
     );
-    console.log(res.body);
   });
 
 
-  it("GET /api/blog/delete/:id delete a blog with id", async () => {
+  it("DELETE /api/blog/delete/:id delete a blog with id", async () => {
     const res = await request(app)
       .delete(`/api/blog/${blogId}`)
       .set("Content-type", "application/json")
