@@ -232,7 +232,7 @@ describe("Testing Product Route API", () => {
     const res = await request(app)
       .put("/api/product/rating")
       .set("Cookie", cookies)
-      .send({ productId: productId, star: 4 })
+      .send({ productId: productId, star: 4, comment: "This is so good!!" })
       .expect(200);
 
     expect(res.body).toEqual(
@@ -247,9 +247,14 @@ describe("Testing Product Route API", () => {
           color: "Red",
           totalrating: "4",
         },
-        expect.objectContaining({ ratings: [{ star: 4, postedby: userId }] })
+        expect.objectContaining({
+          ratings: [
+            { star: 4, postedby: userId, comment: "This is so good!!" },
+          ],
+        })
       )
     );
+    console.log(res.body);
   });
 
   it("DELETE /api/product/:id Delete a product", async () => {
