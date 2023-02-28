@@ -6,6 +6,7 @@ const { MongoMemoryServer } = require("mongodb-memory-server");
 describe("Testing Blog Route API", () => {
   let cookies;
   let blogId;
+  let userId;
 
   beforeAll(async () => {
     const mongoServer = await MongoMemoryServer.create();
@@ -17,7 +18,6 @@ describe("Testing Blog Route API", () => {
     await mongoose.disconnect();
     await mongoose.connection.close();
   });
-
 
   it("POST /api/user/register Create new user in database", async () => {
     const mockUser = {
@@ -58,139 +58,179 @@ describe("Testing Blog Route API", () => {
       .expect(200);
 
     // get cookies for authentication
-    cookies = res.headers['set-cookie']
+    cookies = res.headers["set-cookie"];
+    userId = res.body._id;
   });
 
-  it("POST /api/blog/ create a new blog", async()  => {
+  it("POST /api/blog/ create a new blog", async () => {
     const mockBlog = {
-        title: "How to code effectively",
-        description: "This is a starter article for the dumbers",
-        category: "Coding",
+      title: "How to code effectively",
+      description: "This is a starter article for the dumbers",
+      category: "Coding",
     };
     const res = await request(app)
-    .post("/api/blog/")
-    .set("Content-type", "application/json")
-    .set("Cookie", cookies)
-    .send(mockBlog)
-    .expect(200);
+      .post("/api/blog/")
+      .set("Content-type", "application/json")
+      .set("Cookie", cookies)
+      .send(mockBlog)
+      .expect(200);
 
-    expect(res.body).toEqual(expect.objectContaining({
+    expect(res.body).toEqual(
+      expect.objectContaining({
         title: "How to code effectively",
         description: "This is a starter article for the dumbers",
         category: "Coding",
-    }));
+      })
+    );
     blogId = res.body._id;
   });
 
-  it("POST /api/blog/ create a new sample blog", async()  => {
+  it("POST /api/blog/ create a new sample blog", async () => {
     const mockBlog = {
+      title: "How to write a book",
+      description: "This is a starter article for the dumbers 1",
+      category: "Book",
+    };
+    const res = await request(app)
+      .post("/api/blog/")
+      .set("Content-type", "application/json")
+      .set("Cookie", cookies)
+      .send(mockBlog)
+      .expect(200);
+
+    expect(res.body).toEqual(
+      expect.objectContaining({
         title: "How to write a book",
         description: "This is a starter article for the dumbers 1",
         category: "Book",
-    };
-    const res = await request(app)
-    .post("/api/blog/")
-    .set("Content-type", "application/json")
-    .set("Cookie", cookies)
-    .send(mockBlog)
-    .expect(200);
-
-    expect(res.body).toEqual(expect.objectContaining({
-        title: "How to write a book",
-        description: "This is a starter article for the dumbers 1",
-        category: "Book",
-    }));
+      })
+    );
   });
 
-  it("POST /api/blog/ create a newer sample blog", async()  => {
+  it("POST /api/blog/ create a newer sample blog", async () => {
     const mockBlog = {
-        title: "How to debug effectively",
-        description: "This is a starter article for the dumbers to debugging",
-        category: "Coding",
+      title: "How to debug effectively",
+      description: "This is a starter article for the dumbers to debugging",
+      category: "Coding",
     };
     const res = await request(app)
-    .post("/api/blog/")
-    .set("Content-type", "application/json")
-    .set("Cookie", cookies)
-    .send(mockBlog)
-    .expect(200);
+      .post("/api/blog/")
+      .set("Content-type", "application/json")
+      .set("Cookie", cookies)
+      .send(mockBlog)
+      .expect(200);
 
-    expect(res.body).toEqual(expect.objectContaining({
+    expect(res.body).toEqual(
+      expect.objectContaining({
         title: "How to debug effectively",
         description: "This is a starter article for the dumbers to debugging",
         category: "Coding",
-    }));
+      })
+    );
   });
 
-  it("GET /api/blog/:id find a blog with id", async()  => {
+  it("PUT /api/blog/:id update a new blog", async () => {
+    const mockBlog = {
+      title: "How to code clean",
+      description: "This is a starter article for the dumbers to code cleaer",
+      category: "Coding",
+    };
     const res = await request(app)
-    .get(`/api/blog/${blogId}`)
-    .set("Content-type", "application/json")
-    .set("Cookie", cookies)
-    .expect(200);
+      .put(`/api/blog/${blogId}`)
+      .set("Content-type", "application/json")
+      .set("Cookie", cookies)
+      .send(mockBlog)
+      .expect(200);
 
-    expect(res.body).toEqual(expect.objectContaining({
-        title: "How to code effectively",
-        description: "This is a starter article for the dumbers",
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        title: "How to code clean",
+        description: "This is a starter article for the dumbers to code cleaer",
+        category: "Coding",
+      })
+    );
+  });
+
+  it("PUT /api/blog/likes Like a blog", async () => {
+    const res = await request(app)
+      .put("/api/blog/likes")
+      .set("Cookie", cookies)
+      .send({ blogId: blogId })
+      .expect(200);
+
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        title: "How to code clean",
+        description: "This is a starter article for the dumbers to code cleaer",
+        category: "Coding",
+        isLiked: true,
+        isDisliked: false,
+        likes: [userId],
+      })
+    );
+  });
+
+  it("PUT /api/blog/likes Dislike a blog", async () => {
+    const res = await request(app)
+      .put("/api/blog/dislikes")
+      .set("Cookie", cookies)
+      .send({ blogId: blogId })
+      .expect(200);
+
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        title: "How to code clean",
+        description: "This is a starter article for the dumbers to code cleaer",
+        category: "Coding",
+        isLiked: false,
+        isDisliked: true,
+        dislikes: [userId],
+      })
+    );
+  });
+
+  it("GET /api/blog/:id find a blog with id", async () => {
+    const res = await request(app)
+      .get(`/api/blog/${blogId}`)
+      .set("Content-type", "application/json")
+      .set("Cookie", cookies)
+      .expect(200);
+
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        title: "How to code clean",
+        description: "This is a starter article for the dumbers to code cleaer",
         category: "Coding",
         numViews: 1,
-    }));
-  });
-
-
-  it("PUT /api/blog/:id update a new blog", async()  => {
-    const mockBlog = {
-        title: "How to code clean",
-        description: "This is a starter article for the dumbers to code cleaer",
-        category: "Coding",
-    };
-    const res = await request(app)
-    .put(`/api/blog/${blogId}`)
-    .set("Content-type", "application/json")
-    .set("Cookie", cookies)
-    .send(mockBlog)
-    .expect(200);
-
-    expect(res.body).toEqual(expect.objectContaining({
-        title: "How to code clean",
-        description: "This is a starter article for the dumbers to code cleaer",
-        category: "Coding",
-    }));
-  });
-
-  it("GET /api/blog/delete/:id delete a blog with id", async()  => {
-    const res = await request(app)
-    .delete(`/api/blog/${blogId}`)
-    .set("Content-type", "application/json")
-    .set("Cookie", cookies)
-    .expect(200);
-
-    expect(res.body).toEqual(expect.objectContaining({
-        title: "How to code clean",
-        description: "This is a starter article for the dumbers to code cleaer",
-        category: "Coding",
-    }));
-  });
-
-
-  it("GET /api/blog/ find all blog", async()  => {
-    const res = await request(app)
-    .get("/api/blog/all-blog")
-    .set("Content-type", "application/json")
-    .set("Cookie", cookies)
-    .expect(200);
-
-    expect(res.body.length).toBeGreaterThan(0);
+      })
+    );
     console.log(res.body);
   });
 
 
+  it("GET /api/blog/delete/:id delete a blog with id", async () => {
+    const res = await request(app)
+      .delete(`/api/blog/${blogId}`)
+      .set("Content-type", "application/json")
+      .set("Cookie", cookies)
+      .expect(200);
 
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        title: "How to code clean",
+        description: "This is a starter article for the dumbers to code cleaer",
+        category: "Coding",
+      })
+    );
+  });
 
+  it("GET /api/blog/ find all blog", async () => {
+    const res = await request(app)
+      .get("/api/blog/all-blog")
+      .set("Content-type", "application/json")
+      .set("Cookie", cookies)
+      .expect(200);
 
-
-
-
-
-
+    expect(res.body.length).toBeGreaterThan(0);
+  });
 });
