@@ -342,7 +342,62 @@ describe("Testing User Route API", () => {
         orderby: loginUserId,
       })
     );
-    console.log(res.body);
+  });
+
+  test("GET /api/user/cart Get user cart", async () => {
+    const res = await request(app)
+      .get("/api/user/cart")
+      .set("Cookie", cookies)
+      .expect(200);
+
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        products: [
+          expect.objectContaining({
+            product: products[0],
+            count: 4,
+            color: "yellow",
+            price: 500,
+          }),
+          expect.objectContaining({
+            product: products[1],
+            count: 5,
+            color: "red",
+            price: 1500,
+          }),
+        ],
+        cartTotal: 9500,
+        orderby: loginUserId,
+      })
+    );
+  });
+
+  test("DELETE /api/user/cart Empty user cart", async () => {
+    const res = await request(app)
+      .delete("/api/user/cart")
+      .set("Cookie", cookies)
+      .expect(200);
+
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        products: [
+          expect.objectContaining({
+            product: products[0],
+            count: 4,
+            color: "yellow",
+            price: 500,
+          }),
+          expect.objectContaining({
+            product: products[1],
+            count: 5,
+            color: "red",
+            price: 1500,
+          }),
+        ],
+        cartTotal: 9500,
+        orderby: loginUserId,
+      })
+    );
   });
 
   test("PUT /api/user/block-user/:id Block user ginta2777@gmail.com but unauthorized", async () => {
