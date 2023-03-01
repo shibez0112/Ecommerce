@@ -5,8 +5,10 @@ const { MongoMemoryServer } = require("mongodb-memory-server");
 
 describe("Testing User Route API", () => {
   let cookies;
+  let loginUserId;
   let userId;
   let productId;
+  let products = [];
 
   beforeAll(async () => {
     const mongoServer = await MongoMemoryServer.create();
@@ -108,6 +110,7 @@ describe("Testing User Route API", () => {
 
     // get cookies for authentication
     cookies = res.headers["set-cookie"];
+    loginUserId = res.body._id;
   });
 
   test("POST /api/user/login Login with incorrect password", async () => {
@@ -205,6 +208,37 @@ describe("Testing User Route API", () => {
     );
   });
 
+  test("POST /api/product/ Create a new product", async () => {
+    const mockProduct = {
+      title: "Apple Watch",
+      description: "This is an apple product",
+      price: 500,
+      quantity: 100,
+      category: "Phone",
+      brand: "Apple",
+      color: "Red",
+    };
+
+    const res = await request(app)
+      .post("/api/product/")
+      .set("Content-type", "application/json")
+      .set("Cookie", cookies)
+      .send(mockProduct)
+      .expect(200);
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        title: "Apple Watch",
+        description: "This is an apple product",
+        price: 500,
+        quantity: 100,
+        category: "Phone",
+        brand: "Apple",
+        color: "Red",
+      })
+    );
+    products.push(res.body._id);
+  });
+
   test("POST /api/product/ Create a second product", async () => {
     const mockProduct = {
       title: "Apple Watch 2",
@@ -235,6 +269,7 @@ describe("Testing User Route API", () => {
     );
 
     productId = res.body._id;
+    products.push(res.body._id);
   });
 
   test("PUT /api/product/wishlist Wishlist a product", async () => {
@@ -263,6 +298,51 @@ describe("Testing User Route API", () => {
       .expect(200);
 
     expect(res.body.wishlist.length).toBeGreaterThan(0);
+  });
+
+  test("POST /api/user/cart Add to cart products", async () => {
+    const mockCart = {
+      cart: [
+        {
+          _id: products[0],
+          count: 4,
+          color: "yellow",
+        },
+        {
+          _id: products[1],
+          count: 5,
+          color: "red",
+        },
+      ],
+    };
+
+    const res = await request(app)
+      .post("/api/user/cart")
+      .set("Cookie", cookies)
+      .send(mockCart)
+      .expect(200);
+
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        products: [
+          expect.objectContaining({
+            product: products[0],
+            count: 4,
+            color: "yellow",
+            price: 500,
+          }),
+          expect.objectContaining({
+            product: products[1],
+            count: 5,
+            color: "red",
+            price: 1500,
+          }),
+        ],
+        cartTotal: 9500,
+        orderby: loginUserId,
+      })
+    );
+    console.log(res.body);
   });
 
   test("PUT /api/user/block-user/:id Block user ginta2777@gmail.com but unauthorized", async () => {
