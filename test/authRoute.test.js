@@ -396,7 +396,7 @@ describe("Testing User Route API", () => {
     );
   });
 
-  it("POST /api/user/cart/coupon Apply a coupon", async () => {
+  test("POST /api/user/cart/coupon Apply a coupon", async () => {
     const mockCoupon = {
       coupon: "HELLO",
     };
@@ -408,6 +408,31 @@ describe("Testing User Route API", () => {
       .expect(200);
 
     expect(res.body).toEqual("7600.00");
+  });
+
+  test("POST /api/user/cart/cash-order Make an order", async () => {
+    const mockOrder = {
+      COD: true,
+      couponApplied: true,
+    };
+    const res = await request(app)
+      .post("/api/user/cart/cash-order")
+      .set("Content-type", "application/json")
+      .set("Cookie", cookies)
+      .send(mockOrder)
+      .expect(200);
+
+    expect(res.body).toEqual({message: "success"});
+  });
+
+  test("GET /api/user/get-orders Get an order", async () => {
+    const res = await request(app)
+      .get("/api/user/get-orders")
+      .set("Content-type", "application/json")
+      .set("Cookie", cookies)
+      .expect(200);
+
+    expect(res.body.length).toBeGreaterThan(0);
   });
 
   test("DELETE /api/user/cart Empty user cart", async () => {
