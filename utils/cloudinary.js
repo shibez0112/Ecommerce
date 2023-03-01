@@ -1,4 +1,5 @@
 const cloudinary = require("cloudinary");
+
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.API_KEY,
@@ -10,7 +11,7 @@ const cloudinaryUploadImg = async (fileToUpload) => {
     cloudinary.uploader.upload(fileToUpload, (result) => {
       resolve(
         {
-          url: result.sercure_url,
+          url: result.secure_url,
         },
         {
           resource_type: "auto",
