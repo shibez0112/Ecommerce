@@ -6,6 +6,7 @@ const { MongoMemoryServer } = require("mongodb-memory-server");
 describe("Testing User Route API", () => {
   let cookies;
   let userId;
+  let productId;
 
   beforeAll(async () => {
     const mongoServer = await MongoMemoryServer.create();
@@ -18,7 +19,7 @@ describe("Testing User Route API", () => {
     await mongoose.connection.close();
   });
 
-  it("POST /api/user/register Create new user in database", async () => {
+  test("POST /api/user/register Create new user in database", async () => {
     const mockUser = {
       firstname: "Toan",
       lastname: "Pham",
@@ -44,7 +45,7 @@ describe("Testing User Route API", () => {
     );
   });
 
-  it("POST /api/user/register Create another new user in database", async () => {
+  test("POST /api/user/register Create another new user in database", async () => {
     const mockUser = {
       firstname: "Toane",
       lastname: "Phame",
@@ -72,7 +73,7 @@ describe("Testing User Route API", () => {
     userId = res.body._id;
   });
 
-  it("POST /api/user/register Create duplicate user with same email in database", async () => {
+  test("POST /api/user/register Create duplicate user with same email in database", async () => {
     const mockUser = {
       firstname: "Toan",
       lastname: "Phan",
@@ -93,7 +94,7 @@ describe("Testing User Route API", () => {
     );
   });
 
-  it("POST /api/user/login Login with correct password", async () => {
+  test("POST /api/user/login Login with correct password", async () => {
     const mockUser = {
       email: "ginta2888@gmail.com",
       password: "$ecret123",
@@ -109,7 +110,7 @@ describe("Testing User Route API", () => {
     cookies = res.headers["set-cookie"];
   });
 
-  it("POST /api/user/login Login with incorrect password", async () => {
+  test("POST /api/user/login Login with incorrect password", async () => {
     const mockUser = {
       email: "ginta2888@gmail.com",
       password: "ecret123",
@@ -127,7 +128,7 @@ describe("Testing User Route API", () => {
     );
   });
 
-  it("GET /api/user/all-users Get all user from db", async () => {
+  test("GET /api/user/all-users Get all user from db", async () => {
     const res = await request(app)
       .get("/api/user/all-users")
       .set("Content-type", "application/json")
@@ -151,7 +152,7 @@ describe("Testing User Route API", () => {
     ]);
   });
 
-  it("PUT /api/user/block-user/:id Block user ginta2777@gmail.com ", async () => {
+  test("PUT /api/user/block-user/:id Block user ginta2777@gmail.com ", async () => {
     const res = await request(app)
       .put(`/api/user/block-user/${userId}`)
       .set("Cookie", cookies)
@@ -168,7 +169,7 @@ describe("Testing User Route API", () => {
     );
   });
 
-  it("PUT /api/user/block-user/:id Unblock user ginta2777@gmail.com ", async () => {
+  test("PUT /api/user/block-user/:id Unblock user ginta2777@gmail.com ", async () => {
     const res = await request(app)
       .put(`/api/user/unblock-user/${userId}`)
       .set("Cookie", cookies)
@@ -185,7 +186,86 @@ describe("Testing User Route API", () => {
     );
   });
 
-  it("PUT /api/user/block-user/:id Block user ginta2777@gmail.com but unauthorized", async () => {
+  test("PUT /api/user/save-address Save address of user ", async () => {
+    const res = await request(app)
+      .put("/api/user/save-address")
+      .set("Cookie", cookies)
+      .send({ address: "ThuDuc Province" })
+      .expect(200);
+
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        firstname: "Toan",
+        lastname: "Pham",
+        email: "ginta2888@gmail.com",
+        mobile: "0918322179",
+        role: "admin",
+        address: "ThuDuc Province",
+      })
+    );
+  });
+
+  test("POST /api/product/ Create a second product", async () => {
+    const mockProduct = {
+      title: "Apple Watch 2",
+      description: "This is a new apple product",
+      price: 1500,
+      quantity: 1100,
+      category: "Phone",
+      brand: "Apple",
+      color: "Red",
+    };
+
+    const res = await request(app)
+      .post("/api/product/")
+      .set("Content-type", "application/json")
+      .set("Cookie", cookies)
+      .send(mockProduct)
+      .expect(200);
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        title: "Apple Watch 2",
+        description: "This is a new apple product",
+        price: 1500,
+        quantity: 1100,
+        category: "Phone",
+        brand: "Apple",
+        color: "Red",
+      })
+    );
+
+    productId = res.body._id;
+  });
+
+  test("PUT /api/product/wishlist Wishlist a product", async () => {
+    const res = await request(app)
+      .put("/api/product/wishlist")
+      .set("Cookie", cookies)
+      .send({ productId: productId })
+      .expect(200);
+
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        firstname: "Toan",
+        lastname: "Pham",
+        email: "ginta2888@gmail.com",
+        mobile: "0918322179",
+        role: "admin",
+        wishlist: [productId],
+      })
+    );
+  });
+
+  test("GET /api/user/wishlist Check wishlist of user ", async () => {
+    const res = await request(app)
+      .get("/api/user/wishlist")
+      .set("Cookie", cookies)
+      .expect(200);
+
+    expect(res.body.wishlist.length).toBeGreaterThan(0);
+  });
+
+  test("PUT /api/user/block-user/:id Block user ginta2777@gmail.com but unauthorized", async () => {
     const mockUser = {
       email: "ginta2777@gmail.com",
       password: "$ecret123",
@@ -211,7 +291,7 @@ describe("Testing User Route API", () => {
     );
   });
 
-  it("PUT /api/user/password Reset user password", async () => {
+  test("PUT /api/user/password Reset user password", async () => {
     let mockUser = {
       email: "ginta2888@gmail.com",
       password: "$ecret123",
@@ -238,7 +318,6 @@ describe("Testing User Route API", () => {
       .set("Cookie", cookies)
       .send(mockPassword)
       .expect(200);
-      console.log("Change password success");
 
     // Login
     const loginAgain = await request(app)
