@@ -19,7 +19,7 @@ describe("Testing Coupon Category Route API", () => {
     await mongoose.connection.close();
   });
 
-  it("POST /api/user/register Create new user in database", async () => {
+  test("POST /api/user/register Create new user in database", async () => {
     const mockUser = {
       firstname: "Toan",
       lastname: "Pham",
@@ -45,7 +45,7 @@ describe("Testing Coupon Category Route API", () => {
     );
   });
 
-  it("POST /api/user/login Login with correct password", async () => {
+  test("POST /api/user/login Login with correct password", async () => {
     const mockUser = {
       email: "ginta2888@gmail.com",
       password: "$ecret123",
@@ -63,7 +63,7 @@ describe("Testing Coupon Category Route API", () => {
   });
 
   
-  it("POST /api/coupon/ Create a new coupon", async () => {
+  test("POST /api/coupon/ Create a new coupon", async () => {
     const mockCoupon = {
       name: "HELLO",
       expiry: "2023-03-05T07:33:58.000Z",
@@ -86,7 +86,7 @@ describe("Testing Coupon Category Route API", () => {
     couponId = res.body._id;
   });
 
-  it("POST /api/coupon/ Create a second coupon", async () => {
+  test("POST /api/coupon/ Create a second coupon", async () => {
     const mockCoupon = {
       name: "WORLD",
       expiry: "2023-04-05T07:33:58.000Z",
@@ -108,7 +108,7 @@ describe("Testing Coupon Category Route API", () => {
     );
   });
 
-  it("POST /api/coupon/ Create a new coupon", async () => {
+  test("POST /api/coupon/ Create a new coupon", async () => {
     const mockCoupon = {
       name: "HAHA",
       expiry: "2023-05-05T07:33:58.000Z",
@@ -130,7 +130,7 @@ describe("Testing Coupon Category Route API", () => {
     );
   });
 
-  it("PUT /api/coupon/:id update a new blog", async () => {
+  test("PUT /api/coupon/:id update a new blog", async () => {
     const mockCoupon = {
         name: "HEYJUDES",
         expiry: "2023-09-09T02:33:58.000Z",
@@ -152,7 +152,7 @@ describe("Testing Coupon Category Route API", () => {
     );
   });
 
-  it("GET /api/coupon/:id find a coupon with id", async () => {
+  test("GET /api/coupon/:id find a coupon with id", async () => {
     const res = await request(app)
       .get(`/api/coupon/${couponId}`)
       .set("Content-type", "application/json")
@@ -168,7 +168,7 @@ describe("Testing Coupon Category Route API", () => {
     );
   });
 
-  it("DELETE /api/coupon/delete/:id delete a coupon with id", async () => {
+  test("DELETE /api/coupon/delete/:id delete a coupon with id", async () => {
     const res = await request(app)
       .delete(`/api/coupon/${couponId}`)
       .set("Content-type", "application/json")
@@ -185,7 +185,7 @@ describe("Testing Coupon Category Route API", () => {
   });
 
   
-  it("GET /api/blog/all-blog find all blog", async () => {
+  test("GET /api/blog/all-blog find all blog", async () => {
     const res = await request(app)
       .get("/api/coupon/all-coupon")
       .set("Content-type", "application/json")

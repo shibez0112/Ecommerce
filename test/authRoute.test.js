@@ -9,6 +9,7 @@ describe("Testing User Route API", () => {
   let userId;
   let productId;
   let products = [];
+  let couponId;
 
   beforeAll(async () => {
     const mongoServer = await MongoMemoryServer.create();
@@ -300,6 +301,29 @@ describe("Testing User Route API", () => {
     expect(res.body.wishlist.length).toBeGreaterThan(0);
   });
 
+  it("POST /api/coupon/ Create a new coupon", async () => {
+    const mockCoupon = {
+      name: "HELLO",
+      expiry: "2023-03-05T07:33:58.000Z",
+      discount: 20,
+    };
+    const res = await request(app)
+      .post("/api/coupon/")
+      .set("Content-type", "application/json")
+      .set("Cookie", cookies)
+      .send(mockCoupon)
+      .expect(200);
+
+    expect(res.body).toEqual(
+      expect.objectContaining({
+        name: "HELLO",
+        expiry: "2023-03-05T07:33:58.000Z",
+        discount: 20,
+      })
+    );
+    couponId = res.body._id;
+  });
+
   test("POST /api/user/cart Add to cart products", async () => {
     const mockCart = {
       cart: [
@@ -370,6 +394,20 @@ describe("Testing User Route API", () => {
         orderby: loginUserId,
       })
     );
+  });
+
+  it("POST /api/user/cart/coupon Apply a coupon", async () => {
+    const mockCoupon = {
+      coupon: "HELLO",
+    };
+    const res = await request(app)
+      .post("/api/user/cart/apply-coupon")
+      .set("Content-type", "application/json")
+      .set("Cookie", cookies)
+      .send(mockCoupon)
+      .expect(200);
+
+    expect(res.body).toEqual("7600.00");
   });
 
   test("DELETE /api/user/cart Empty user cart", async () => {
