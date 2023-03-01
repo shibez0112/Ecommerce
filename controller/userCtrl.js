@@ -199,7 +199,6 @@ const forgotPasswordToken = asyncHandler(async (req, res) => {
   if (!user) throw new Error("User not found with this email");
   try {
     const token = await user.createPasswordResetToken();
-    console.log("work until heere");
     await user.save();
     const resetURL = `Hello, Please follow this link to reset Your Password. Ths link is valid till 10 minutes from now. <a href="http://localhost:3000/api/user/reset-password/${token}">Click Here</a>`;
     const data = {
@@ -231,6 +230,37 @@ const resetPassword = asyncHandler(async (req, res) => {
   res.json(user);
 });
 
+const getWishList = asyncHandler(async (req, res) => {
+  const { _id } = req.user;
+  validateMongoDbId(_id);
+  try {
+    const findUser = await User.findById(_id).populate("wishlist");
+    res.json(findUser);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const saveAddress = asyncHandler(async (req, res, next) => {
+  const { _id } = req.user;
+  validateMongoDbId(_id);
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      _id,
+      {
+        address: req.body.address,
+      },
+      {
+        new: true,
+      }
+    );
+    res.json(updatedUser);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
 module.exports = {
   createUser,
   loginUserCtrl,
@@ -245,4 +275,6 @@ module.exports = {
   updatePassword,
   forgotPasswordToken,
   resetPassword,
+  getWishList,
+  saveAddress,
 };
