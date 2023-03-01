@@ -3,6 +3,7 @@ const request = require("supertest");
 const app = require("../index");
 const { MongoMemoryServer } = require("mongodb-memory-server");
 
+
 describe("Testing Product Route API", () => {
   let cookies;
   let productId;
@@ -19,7 +20,7 @@ describe("Testing Product Route API", () => {
     await mongoose.connection.close();
   });
 
-  it("POST /api/user/register Create new user in database", async () => {
+  test("POST /api/user/register Create new user in database", async () => {
     const mockUser = {
       firstname: "Toan",
       lastname: "Pham",
@@ -45,7 +46,7 @@ describe("Testing Product Route API", () => {
     );
   });
 
-  it("POST /api/user/login Login with correct password", async () => {
+  test("POST /api/user/login Login with correct password", async () => {
     const mockUser = {
       email: "ginta2888@gmail.com",
       password: "$ecret123",
@@ -62,7 +63,7 @@ describe("Testing Product Route API", () => {
     userId = res.body._id;
   });
 
-  it("POST /api/product/ Create a new product", async () => {
+  test("POST /api/product/ Create a new product", async () => {
     const mockProduct = {
       title: "Apple Watch",
       description: "This is an apple product",
@@ -91,7 +92,7 @@ describe("Testing Product Route API", () => {
     );
   });
 
-  it("POST /api/product/ Create a second product", async () => {
+  test("POST /api/product/ Create a second product", async () => {
     const mockProduct = {
       title: "Apple Watch 2",
       description: "This is a new apple product",
@@ -123,7 +124,7 @@ describe("Testing Product Route API", () => {
     productId = res.body._id;
   });
 
-  it("POST /api/product/ Create a third product", async () => {
+  test("POST /api/product/ Create a third product", async () => {
     const mockProduct = {
       title: "HP Laptop",
       description: "This is a HP laptop",
@@ -153,7 +154,7 @@ describe("Testing Product Route API", () => {
     );
   });
 
-  it("GET /api/product/:id Get a product", async () => {
+  test("GET /api/product/:id Get a product", async () => {
     const res = await request(app)
       .get(`/api/product/${productId}`)
       .set("Content-type", "application/json")
@@ -171,7 +172,7 @@ describe("Testing Product Route API", () => {
     );
   });
 
-  it("PUT /api/product/:id Update a product", async () => {
+  test("PUT /api/product/:id Update a product", async () => {
     const updateData = {
       title: "Apple Watch 3",
       description: "This is a newer apple product",
@@ -201,7 +202,7 @@ describe("Testing Product Route API", () => {
     );
   });
 
-  it("GET /api/product/all-product Get all product", async () => {
+  test("GET /api/product/all-product Get all product", async () => {
     const res = await request(app)
       .get("/api/product/all-product")
       .set("Content-type", "application/json")
@@ -209,7 +210,7 @@ describe("Testing Product Route API", () => {
     expect(res.body.length).toBeGreaterThan(0);
   });
 
-  it("PUT /api/product/wishlist Wishlist a product", async () => {
+  test("PUT /api/product/wishlist Wishlist a product", async () => {
     const res = await request(app)
       .put("/api/product/wishlist")
       .set("Cookie", cookies)
@@ -228,7 +229,7 @@ describe("Testing Product Route API", () => {
     );
   });
 
-  it("PUT /api/product/rating Rate a product", async () => {
+  test("PUT /api/product/rating Rate a product", async () => {
     const res = await request(app)
       .put("/api/product/rating")
       .set("Cookie", cookies)
@@ -254,10 +255,9 @@ describe("Testing Product Route API", () => {
         })
       )
     );
-    console.log(res.body);
   });
 
-  it("DELETE /api/product/:id Delete a product", async () => {
+  test("DELETE /api/product/:id Delete a product", async () => {
     const res = await request(app)
       .delete(`/api/product/${productId}`)
       .set("Cookie", cookies)
@@ -275,7 +275,7 @@ describe("Testing Product Route API", () => {
     );
   });
 
-  it("GET /api/product/all-product Get all HP product", async () => {
+  test("GET /api/product/all-product Get all HP product", async () => {
     const res = await request(app)
       .get("/api/product/all-product?sort=category.brand")
       .set("Content-type", "application/json")
@@ -283,11 +283,27 @@ describe("Testing Product Route API", () => {
     expect(res.body.length).toBeGreaterThan(0);
   });
 
-  it("GET /api/product/all-product Get all HP product", async () => {
+  test("GET /api/product/all-product Get all HP product", async () => {
     const res = await request(app)
       .get("/api/product/all-product?fields=title,price,category")
       .set("Content-type", "application/json")
       .expect(200);
     expect(res.body.length).toBeGreaterThan(0);
   });
+
+  // test("PUT /api/product/upload/:id Upload image for a product", (done) => {
+  //   const testImage = "C:/Users/Toan Pham/Pictures/ejtfyurzip3a1.jpg";
+
+  //   const res = request(app)
+  //     .put(`/api/product/upload/${productId}`)
+  //     .set("content-type", "application/octet-stream")
+  //     .set("Cookie", cookies)
+  //     .expect(200);
+
+  //   const imgStream = fs.createReadStream(testImage);
+  //   imgStream.on("end", () => res.end(done));
+  //   imgStream.pipe(res, { end: false });
+
+  //   console.log(res.body);
+  // });
 });

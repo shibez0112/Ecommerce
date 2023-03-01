@@ -28,11 +28,12 @@ const multerFilter = (req, file, cb) => {
 const uploadPhoto = multer({
   storage: multerStorage,
   fileFilter: multerFilter,
-  limits: { fileSize: 2000000 },
+  limits: { fieldSize: 2000000 },
 });
 
 const productImgResize = async (req, res, next) => {
   if (!req.files) return next();
+
   await Promise.all(
     req.files.map(async (file) => {
       await sharp(file.path)
@@ -46,17 +47,17 @@ const productImgResize = async (req, res, next) => {
 };
 
 const blogImgResize = async (req, res, next) => {
-    if (!req.files) return next();
-    await Promise.all(
-      req.files.map(async (file) => {
-        await sharp(file.path)
-          .resize(300, 300)
-          .toFormat("jpeg")
-          .jpeg({ quality: 90 })
-          .toFile(`public/images/blogs/${file.filename}`);
-      })
-    );
-    next();
-  };
+  if (!req.files) return next();
+  await Promise.all(
+    req.files.map(async (file) => {
+      await sharp(file.path)
+        .resize(300, 300)
+        .toFormat("jpeg")
+        .jpeg({ quality: 90 })
+        .toFile(`public/images/blogs/${file.filename}`);
+    })
+  );
+  next();
+};
 
-module.exports = {uploadPhoto, productImgResize, blogImgResize};
+module.exports = { uploadPhoto, productImgResize, blogImgResize };
