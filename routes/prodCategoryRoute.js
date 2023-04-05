@@ -1,9 +1,16 @@
 const express = require("express");
-const { createCategory, updateCategory, getAllCategory, getCategory, deleteCategory } = require("../controller/prodCategoryCtrl");
+const {
+  createCategory,
+  updateCategory,
+  getAllCategory,
+  getCategory,
+  deleteCategory,
+} = require("../controller/prodCategoryCtrl");
 const router = express.Router();
-const {authMiddleware, isAdmin} = require("../middlewares/authMiddleware");
+const { authMiddleware, isAdmin } = require("../middlewares/authMiddleware");
 
 router.get("/all-category", authMiddleware, isAdmin, getAllCategory);
+router.get("/all-category", getAllCategory);
 router.get("/:id", authMiddleware, isAdmin, getCategory);
 router.post("/", authMiddleware, isAdmin, createCategory);
 router.put("/:id", authMiddleware, isAdmin, updateCategory);

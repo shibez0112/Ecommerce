@@ -14,12 +14,19 @@ const couponRouter = require("./routes/couponRoute");
 const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 const PORT = process.env.PORT || 3000;
-//dbConnect();
+const cors = require("cors");
+dbConnect();
 
 // Middleware
 app.use(morgan("dev"));
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false}));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 // Routing
@@ -30,7 +37,6 @@ app.use("/api/prodCategory", prodCategoryRouter);
 app.use("/api/blogCategory", blogCategoryRouter);
 app.use("/api/brandCategory", brandCategoryRouter);
 app.use("/api/coupon", couponRouter);
-
 
 app.use(notFound);
 app.use(errorHandler);

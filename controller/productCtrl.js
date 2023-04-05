@@ -72,7 +72,7 @@ const getAllProduct = asyncHandler(async (req, res) => {
       const fields = req.query.fields.split(",").join(" ");
       query = query.select(fields);
     } else {
-      query = query.select("__v");
+      // query = query.select("__v");
     }
 
     // Pagination

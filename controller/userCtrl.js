@@ -42,6 +42,7 @@ const loginUserCtrl = asyncHandler(async (req, res) => {
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       maxAge: 72 * 60 * 60 * 1000,
+      sameSite: "strict",
     });
     res.json({
       _id: findUser?._id,
@@ -49,7 +50,7 @@ const loginUserCtrl = asyncHandler(async (req, res) => {
       lastname: findUser?.lastname,
       email: findUser?.email,
       mobile: findUser?.mobile,
-      token: generateToken(findUser?.id),
+      // token: generateToken(findUser?.id),
     });
   } else {
     throw new Error("Invalid Credentials");
@@ -408,7 +409,7 @@ const getOrders = asyncHandler(async (req, res) => {
   }
 });
 
-const loginAdmin = asyncHandler(async(req, res)=>{
+const loginAdmin = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   // check if user exists or not
   const findAdmin = await User.findOne({ email });
@@ -425,6 +426,7 @@ const loginAdmin = asyncHandler(async(req, res)=>{
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       maxAge: 72 * 60 * 60 * 1000,
+      sameSite: "strict",
     });
     res.json({
       _id: findAdmin?._id,
@@ -432,7 +434,7 @@ const loginAdmin = asyncHandler(async(req, res)=>{
       lastname: findAdmin?.lastname,
       email: findAdmin?.email,
       mobile: findAdmin?.mobile,
-      token: generateToken(findAdmin?.id),
+      //token: generateToken(findAdmin?.id),
     });
   } else {
     throw new Error("Invalid Credentials");
@@ -461,5 +463,5 @@ module.exports = {
   applyCoupon,
   createOrder,
   getOrders,
-  loginAdmin
+  loginAdmin,
 };
